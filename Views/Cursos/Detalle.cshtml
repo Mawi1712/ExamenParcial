@@ -1,0 +1,172 @@
+@model PortalAcademico.Models.Curso
+
+@{
+    ViewData["Title"] = "Detalle del Curso";
+    var yaMatriculado = ViewBag.YaMatriculado as bool? ?? false;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a asp-action="Catalogo">Catálogo</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">@Model.Codigo</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <span class="badge bg-light text-primary">@Model.Codigo</span>
+                        @Model.Nombre
+                    </h2>
+                </div>
+
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <h5 class="text-primary">
+                                    <i class="bi bi-award"></i> Créditos
+                                </h5>
+                                <p class="fs-4 mb-0">@Model.Creditos créditos académicos</p>
+                            </div>
+
+                            <div class="info-item mb-3">
+                                <h5 class="text-primary">
+                                    <i class="bi bi-clock"></i> Horario
+                                </h5>
+                                <p class="fs-5 mb-0">
+                                    @Model.HorarioInicio.ToString(@"hh\:mm") - 
+                                    @Model.HorarioFin.ToString(@"hh\:mm")
+                                </p>
+                                <small class="text-muted">
+                                    Duración: @((Model.HorarioFin - Model.HorarioInicio).TotalHours) horas
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <h5 class="text-primary">
+                                    <i class="bi bi-people"></i> Disponibilidad
+                                </h5>
+                                <div class="progress mb-2" style="height: 30px;">
+                                    @{
+                                        var porcentajeOcupado = Model.CupoMaximo > 0 
+                                            ? ((Model.CupoMaximo - Model.CuposDisponibles) * 100.0 / Model.CupoMaximo) 
+                                            : 0;
+                                        var colorBarra = porcentajeOcupado >= 90 ? "danger" 
+                                            : porcentajeOcupado >= 70 ? "warning" : "success";
+                                    }
+                                    <div class="progress-bar bg-@colorBarra" 
+                                         role="progressbar" 
+                                         style="width: @porcentajeOcupado%"
+                                         aria-valuenow="@porcentajeOcupado" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        @((Model.CupoMaximo - Model.CuposDisponibles)) / @Model.CupoMaximo
+                                    </div>
+                                </div>
+                                @if (Model.CuposDisponibles > 0)
+                                {
+                                    <p class="mb-0">
+                                        <span class="badge bg-success fs-6">
+                                            @Model.CuposDisponibles cupos disponibles
+                                        </span>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p class="mb-0">
+                                        <span class="badge bg-danger fs-6">
+                                            Sin cupos disponibles
+                                        </span>
+                                    </p>
+                                }
+                            </div>
+
+                            <div class="info-item">
+                                <h5 class="text-primary">
+                                    <i class="bi bi-calendar-check"></i> Estado
+                                </h5>
+                                @if (Model.Activo)
+                                {
+                                    <span class="badge bg-success fs-6">
+                                        <i class="bi bi-check-circle"></i> Activo
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary fs-6">
+                                        <i class="bi bi-x-circle"></i> Inactivo
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="d-grid gap-2">
+                        @if (yaMatriculado)
+                        {
+                            <div class="alert alert-info text-center mb-3">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <strong>Ya estás matriculado en este curso</strong>
+                            </div>
+                            <a asp-controller="Matriculas" asp-action="MisCursos" 
+                               class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-list-ul"></i> Ver Mis Cursos
+                            </a>
+                        }
+                        else if (!Model.TieneCupoDisponible)
+                        {
+                            <div class="alert alert-danger text-center mb-3">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <strong>Este curso no tiene cupos disponibles</strong>
+                            </div>
+                            <button class="btn btn-secondary btn-lg" disabled>
+                                <i class="bi bi-x-circle"></i> Sin Cupos
+                            </button>
+                        }
+                        else if (!Model.Activo)
+                        {
+                            <div class="alert alert-warning text-center mb-3">
+                                <i class="bi bi-info-circle-fill"></i>
+                                <strong>Este curso no está activo actualmente</strong>
+                            </div>
+                            <button class="btn btn-secondary btn-lg" disabled>
+                                <i class="bi bi-ban"></i> No Disponible
+                            </button>
+                        }
+                        else
+                        {
+                            <form asp-controller="Matriculas" asp-action="Inscribirse" 
+                                  asp-route-cursoId="@Model.Id" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-check-circle"></i> Inscribirse Ahora
+                                </button>
+                            </form>
+                        }
+
+                        <a asp-action="Catalogo" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver al Catálogo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .info-item h5 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+</style>

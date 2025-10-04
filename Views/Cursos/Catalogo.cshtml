@@ -1,0 +1,148 @@
+@model PortalAcademico.ViewModels.CatalogoViewModel
+
+@{
+    ViewData["Title"] = "Catálogo de Cursos";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4">
+                <i class="bi bi-book"></i> Catálogo de Cursos
+            </h1>
+            <p class="lead">Explora y matricúlate en nuestros cursos disponibles</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-funnel"></i> Filtros de Búsqueda
+            </h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Catalogo" method="get">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Filtros.Nombre" class="form-label">Nombre o Código</label>
+                        <input asp-for="Filtros.Nombre" class="form-control" 
+                               placeholder="Buscar por nombre o código..." />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Filtros.CreditosMin" class="form-label">Créditos Mínimos</label>
+                        <input asp-for="Filtros.CreditosMin" type="number" min="0" 
+                               class="form-control" placeholder="Ej: 3" />
+                        <span asp-validation-for="Filtros.CreditosMin" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Filtros.CreditosMax" class="form-label">Créditos Máximos</label>
+                        <input asp-for="Filtros.CreditosMax" type="number" min="0" 
+                               class="form-control" placeholder="Ej: 5" />
+                        <span asp-validation-for="Filtros.CreditosMax" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Filtros.HorarioInicio" class="form-label">Hora Inicio (desde)</label>
+                        <input asp-for="Filtros.HorarioInicio" type="time" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Filtros.HorarioFin" class="form-label">Hora Fin (hasta)</label>
+                        <input asp-for="Filtros.HorarioFin" type="time" class="form-control" />
+                        <span asp-validation-for="Filtros.HorarioFin" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                        <a asp-action="Catalogo" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-clockwise"></i> Limpiar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        @if (Model.Cursos.Any())
+        {
+            <div class="col-12 mb-3">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> 
+                    Se encontraron <strong>@Model.Cursos.Count</strong> curso(s)
+                </div>
+            </div>
+
+            @foreach (var curso in Model.Cursos)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0">
+                                <span class="badge bg-primary">@curso.Codigo</span>
+                                @curso.Nombre
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="bi bi-award text-primary"></i>
+                                    <strong>Créditos:</strong> @curso.Creditos
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-clock text-primary"></i>
+                                    <strong>Horario:</strong> 
+                                    @curso.HorarioInicio.ToString(@"hh\:mm") - 
+                                    @curso.HorarioFin.ToString(@"hh\:mm")
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-people text-primary"></i>
+                                    <strong>Cupos:</strong>
+                                    @if (curso.CuposDisponibles > 0)
+                                    {
+                                        <span class="badge bg-success">
+                                            @curso.CuposDisponibles disponibles
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Sin cupos</span>
+                                    }
+                                </li>
+                                <li>
+                                    <small class="text-muted">
+                                        Cupo máximo: @curso.CupoMaximo estudiantes
+                                    </small>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <a asp-action="Detalle" asp-route-id="@curso.Id" 
+                               class="btn btn-primary w-100">
+                                <i class="bi bi-eye"></i> Ver Detalles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-warning text-center">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <h4>No se encontraron cursos</h4>
+                    <p class="mb-0">Intenta ajustar los filtros de búsqueda</p>
+                </div>
+            </div>
+        }
+    </row>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
