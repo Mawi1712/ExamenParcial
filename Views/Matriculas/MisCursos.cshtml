@@ -1,0 +1,277 @@
+@model IEnumerable<PortalAcademico.Models.Matricula>
+
+@{
+    ViewData["Title"] = "Mis Cursos";
+    var pendientes = Model.Where(m => m.Estado == PortalAcademico.Models.EstadoMatricula.Pendiente);
+    var confirmadas = Model.Where(m => m.Estado == PortalAcademico.Models.EstadoMatricula.Confirmada);
+    var canceladas = Model.Where(m => m.Estado == PortalAcademico.Models.EstadoMatricula.Cancelada);
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4">
+                <i class="bi bi-journal-bookmark"></i> Mis Cursos
+            </h1>
+            <p class="lead">Gestiona tus matrículas y cursos inscritos</p>
+        </div>
+        <div class="col-auto">
+            <a asp-controller="Cursos" asp-action="Catalogo" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Inscribir Nuevo Curso
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i>
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Warning"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            @TempData["Warning"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-clock-history"></i> Pendientes
+                    </h5>
+                    <h2 class="display-4">@pendientes.Count()</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-check-circle"></i> Confirmadas
+                    </h5>
+                    <h2 class="display-4">@confirmadas.Count()</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-secondary">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-x-circle"></i> Canceladas
+                    </h5>
+                    <h2 class="display-4">@canceladas.Count()</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+            <h4 class="mt-3">No tienes cursos matriculados</h4>
+            <p>Explora nuestro catálogo y encuentra el curso perfecto para ti</p>
+            <a asp-controller="Cursos" asp-action="Catalogo" class="btn btn-primary mt-3">
+                <i class="bi bi-search"></i> Explorar Catálogo
+            </a>
+        </div>
+    }
+    else
+    {
+        @if (pendientes.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="bi bi-clock-history"></i> Matrículas Pendientes
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Curso</th>
+                                    <th>Créditos</th>
+                                    <th>Horario</th>
+                                    <th>Fecha Inscripción</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in pendientes)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">@item.Curso.Codigo</span>
+                                        </td>
+                                        <td>@item.Curso.Nombre</td>
+                                        <td>@item.Curso.Creditos</td>
+                                        <td>
+                                            <small>
+                                                @item.Curso.HorarioInicio.ToString(@"hh\:mm") - 
+                                                @item.Curso.HorarioFin.ToString(@"hh\:mm")
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <small>@item.FechaRegistro.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</small>
+                                        </td>
+                                        <td>
+                                            <form asp-action="Cancelar" asp-route-id="@item.Id" 
+                                                    method="post" class="d-inline"
+                                                    onsubmit="return confirm('¿Estás seguro de cancelar esta matrícula?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-x-circle"></i> Cancelar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (confirmadas.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-check-circle"></i> Matrículas Confirmadas
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Curso</th>
+                                    <th>Créditos</th>
+                                    <th>Horario</th>
+                                    <th>Fecha Inscripción</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in confirmadas)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">@item.Curso.Codigo</span>
+                                        </td>
+                                        <td>@item.Curso.Nombre</td>
+                                        <td>@item.Curso.Creditos</td>
+                                        <td>
+                                            <small>
+                                                @item.Curso.HorarioInicio.ToString(@"hh\:mm") - 
+                                                @item.Curso.HorarioFin.ToString(@"hh\:mm")
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <small>@item.FechaRegistro.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">Confirmada</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (canceladas.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-x-circle"></i> Matrículas Canceladas
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Curso</th>
+                                    <th>Fecha Inscripción</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in canceladas)
+                                {
+                                    <tr class="text-muted">
+                                        <td>
+                                            <span class="badge bg-secondary">@item.Curso.Codigo</span>
+                                        </td>
+                                        <td>@item.Curso.Nombre</td>
+                                        <td>
+                                            <small>@item.FechaRegistro.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">Cancelada</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-calculator"></i> Resumen de Créditos
+                </h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-1">
+                            <strong>Créditos Pendientes:</strong> 
+                            @pendientes.Sum(m => m.Curso.Creditos)
+                        </p>
+                        <p class="mb-1">
+                            <strong>Créditos Confirmados:</strong> 
+                            @confirmadas.Sum(m => m.Curso.Creditos)
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1">
+                            <strong>Total de Créditos Activos:</strong> 
+                            <span class="badge bg-primary fs-6">
+                                @(pendientes.Sum(m => m.Curso.Creditos) + confirmadas.Sum(m => m.Curso.Creditos))
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -132,8 +132,19 @@ static async Task SeedDataAsync(WebApplication app)
                     HorarioInicio = new TimeSpan(16, 0, 0),
                     HorarioFin = new TimeSpan(18, 0, 0),
                     Activo = true
-                }
+                },
+                new PortalAcademico.Models.Curso
+                {
+                Codigo = "WEB501",
+                Nombre = "Desarrollo Web Avanzado",
+                Creditos = 4,
+                CupoMaximo = 2, 
+                HorarioInicio = new TimeSpan(8, 30, 0),
+                HorarioFin = new TimeSpan(10, 30, 0),
+                Activo = true
+                }     
             };
+                
 
             context.Cursos.AddRange(cursos);
             await context.SaveChangesAsync();
