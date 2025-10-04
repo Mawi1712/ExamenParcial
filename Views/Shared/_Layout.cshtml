@@ -1,5 +1,10 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using PortalAcademico.Extensions
+@{
+    var ultimoCurso = Context.Session.GetObject<dynamic>("UltimoCursoVisitado");
+}
+
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,35 +19,63 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PortalAcademico</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-mortarboard-fill"></i> Portal Académico
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cursos" asp-action="Catalogo">
-                            <i class="bi bi-book"></i> Catálogo de Cursos
-                            </a>
-                        </li>
-                            @if (User.Identity?.IsAuthenticated == true)
-                        {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Matriculas" asp-action="MisCursos">
-                                <i class="bi bi-journal-bookmark"></i> Mis Cursos
-                            </a>
-                        </li>
-                        }
-                    </ul>
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Cursos" asp-action="Catalogo">
+            <i class="bi bi-book"></i> Catálogo de Cursos
+        </a>
+    </li>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Matriculas" asp-action="MisCursos">
+                <i class="bi bi-journal-bookmark"></i> Mis Cursos
+            </a>
+        </li>
+        
+        @if (User.IsInRole("Coordinador"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="AdminCursos" asp-action="Index">
+                    <i class="bi bi-gear"></i> Administrar Cursos
+                </a>
+            </li>
+        }
+    }
+</ul>
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
+
+        @if (ultimoCurso != null && User.Identity?.IsAuthenticated == true)
+        {
+            <div class="container">
+                <div class="alert alert-info alert-dismissible fade show d-flex align-items-center" role="alert">
+                    <i class="bi bi-clock-history me-2"></i>
+                    <span class="me-2">Último curso visitado:</span>
+                    <strong class="me-2">@ultimoCurso.GetProperty("Codigo").GetString() - @ultimoCurso.GetProperty("Nombre").GetString()</strong>
+                    <a asp-controller="Cursos" asp-action="Detalle" asp-route-id="@ultimoCurso.GetProperty("Id").GetInt32()" 
+                       class="btn btn-sm btn-outline-primary me-auto">
+                        <i class="bi bi-arrow-right-circle"></i> Volver al curso
+                    </a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        }
     </header>
+    
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -51,9 +84,10 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - PortalAcademico - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2025 - Portal Académico - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

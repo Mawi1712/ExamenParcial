@@ -1,0 +1,84 @@
+@model PortalAcademico.Models.Curso
+
+@{
+    ViewData["Title"] = "Crear Curso";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h1 class="display-4">
+                <i class="bi bi-plus-circle"></i> Crear Nuevo Curso
+            </h1>
+            <hr />
+
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Codigo" class="form-label"></label>
+                                <input asp-for="Codigo" class="form-control" placeholder="Ej: CS101" />
+                                <span asp-validation-for="Codigo" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Creditos" class="form-label"></label>
+                                <input asp-for="Creditos" type="number" min="1" class="form-control" />
+                                <span asp-validation-for="Creditos" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Nombre" class="form-label"></label>
+                            <input asp-for="Nombre" class="form-control" placeholder="Ej: Introducción a la Programación" />
+                            <span asp-validation-for="Nombre" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CupoMaximo" class="form-label"></label>
+                            <input asp-for="CupoMaximo" type="number" min="1" class="form-control" />
+                            <span asp-validation-for="CupoMaximo" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="HorarioInicio" class="form-label"></label>
+                                <input asp-for="HorarioInicio" type="time" class="form-control" />
+                                <span asp-validation-for="HorarioInicio" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="HorarioFin" class="form-label"></label>
+                                <input asp-for="HorarioFin" type="time" class="form-control" />
+                                <span asp-validation-for="HorarioFin" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input asp-for="Activo" class="form-check-input" type="checkbox" checked />
+                            <label asp-for="Activo" class="form-check-label"></label>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-save"></i> Crear Curso
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

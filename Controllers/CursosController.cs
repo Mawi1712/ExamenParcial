@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PortalAcademico.Data;
 using PortalAcademico.ViewModels;
+using PortalAcademico.Services;
+using PortalAcademico.Extensions;
 
 namespace PortalAcademico.Controllers
 {
@@ -10,10 +12,15 @@ namespace PortalAcademico.Controllers
     public class CursosController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICursosCacheService _cursosCacheService;
+        private const string ULTIMO_CURSO_KEY = "UltimoCursoVisitado";
 
-        public CursosController(ApplicationDbContext context)
+        public CursosController(
+            ApplicationDbContext context,
+            ICursosCacheService cursosCacheService)
         {
             _context = context;
+            _cursosCacheService = cursosCacheService;
         }
 
         public async Task<IActionResult> Catalogo(FiltrosCursoViewModel filtros)
@@ -37,10 +44,8 @@ namespace PortalAcademico.Controllers
                     "El horario de fin debe ser posterior al horario de inicio");
             }
 
-            var query = _context.Cursos
-                .Include(c => c.Matriculas)
-                .Where(c => c.Activo)
-                .AsQueryable();
+            var cursosCache = await _cursosCacheService.ObtenerCursosActivosAsync();
+            var query = cursosCache.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filtros.Nombre))
             {
@@ -68,9 +73,7 @@ namespace PortalAcademico.Controllers
                 query = query.Where(c => c.HorarioFin <= filtros.HorarioFin.Value);
             }
 
-            var cursos = await query
-                .OrderBy(c => c.Codigo)
-                .ToListAsync();
+            var cursos = query.OrderBy(c => c.Codigo).ToList();
 
             var viewModel = new CatalogoViewModel
             {
@@ -98,6 +101,14 @@ namespace PortalAcademico.Controllers
             {
                 return NotFound();
             }
+
+            var cursoInfo = new
+            {
+                Id = curso.Id,
+                Codigo = curso.Codigo,
+                Nombre = curso.Nombre
+            };
+            HttpContext.Session.SetObject(ULTIMO_CURSO_KEY, cursoInfo);
 
             var userId = User.Identity?.Name;
             var yaMatriculado = await _context.Matriculas
