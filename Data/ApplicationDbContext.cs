@@ -39,10 +39,9 @@ namespace PortalAcademico.Data
         .HasForeignKey(m => m.CursoId)
         .OnDelete(DeleteBehavior.Restrict);
 
-    // Índice único: Un usuario no puede matricularse más de una vez en el mismo curso
     entity.HasIndex(m => new { m.CursoId, m.UsuarioId })
         .IsUnique()
-        .HasFilter("[Estado] != 2"); // Solo si Estado != Cancelada (2)
+        .HasFilter("[Estado] != 2"); 
 
     entity.Property(m => m.Estado)
         .HasConversion<int>();

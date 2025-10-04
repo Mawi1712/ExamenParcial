@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "Panel de Coordinador";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="display-4">
+                <i class="bi bi-shield-check"></i> Panel de Coordinador
+            </h1>
+            <p class="lead">Administra cursos y matrículas del portal académico</p>
+            <hr />
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6 mb-4">
+            <div class="card border-primary h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-book-fill text-primary" style="font-size: 3rem;"></i>
+                    <h5 class="card-title mt-3">Gestión de Cursos</h5>
+                    <p class="card-text">Crear, editar y desactivar cursos del catálogo</p>
+                    <a asp-controller="AdminCursos" asp-action="Index" class="btn btn-primary">
+                        <i class="bi bi-arrow-right-circle"></i> Administrar Cursos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card border-success h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-people-fill text-success" style="font-size: 3rem;"></i>
+                    <h5 class="card-title mt-3">Gestión de Matrículas</h5>
+                    <p class="card-text">Revisar y confirmar matrículas de estudiantes</p>
+                    <a asp-controller="AdminCursos" asp-action="Index" class="btn btn-success">
+                        <i class="bi bi-arrow-right-circle"></i> Ver por Curso
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+</div>

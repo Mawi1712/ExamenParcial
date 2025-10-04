@@ -70,9 +70,34 @@
                                     }
                                 </td>
                                 <td>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i> Editar
-                                    </a>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-controller="Coordinador" asp-action="Matriculas" asp-route-id="@item.Id" 
+                                        class="btn btn-sm btn-outline-info">
+                                            <i class="bi bi-people"></i>
+                                        </a>
+                                        @if (item.Activo)
+                                        {
+                                            <form asp-controller="Coordinador" asp-action="DesactivarCurso" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                        onclick="return confirm('¿Desactivar este curso?')">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form asp-controller="Coordinador" asp-action="ActivarCurso" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
                                 </td>
                             </tr>
                         }
